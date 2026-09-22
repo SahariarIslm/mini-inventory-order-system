@@ -69,6 +69,28 @@ services:
     networks:
       - mios_network
 
+  frontend:
+    image: node:24-alpine
+    container_name: mios_frontend
+    restart: unless-stopped
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./frontend:/app
+      # Linux-built node_modules stay inside the container: native binaries
+      # (rolldown, oxlint) must match the container OS, and it's much faster
+      # than a Windows bind mount.
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      API_PROXY_TARGET: http://app:8000
+      VITE_USE_POLLING: "true"
+    depends_on:
+      - app
+    networks:
+      - mios_network
+
 networks:
   mios_network:
     driver: bridge
@@ -76,3 +98,4 @@ networks:
 volumes:
   mysql_data:
   redis_data:
+  frontend_node_modules:

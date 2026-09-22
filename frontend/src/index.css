@@ -1,0 +1,269 @@
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --border: #dfe3e8;
+  --text: #1b1f24;
+  --muted: #5d6673;
+  --primary: #2458d6;
+  --primary-hover: #1c47b0;
+  --primary-text: #ffffff;
+  --danger: #b42318;
+  --danger-bg: #fdecea;
+  --admin: #7a3fc4;
+  --staff: #1f7a55;
+  --radius: 8px;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418;
+    --surface: #1a1e24;
+    --border: #2d333b;
+    --text: #e6e9ed;
+    --muted: #9aa4b1;
+    --primary: #5b8cff;
+    --primary-hover: #7aa2ff;
+    --primary-text: #0b1020;
+    --danger: #ff8a80;
+    --danger-bg: #3a1714;
+    --admin: #c29bff;
+    --staff: #5fd3a0;
+    --shadow: none;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 0;
+}
+
+.page-status {
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* --- Layout -------------------------------------------------------------- */
+
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header__inner,
+.app-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 56px;
+  flex-wrap: wrap;
+}
+
+.app-main {
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.brand {
+  font-weight: 700;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.nav a:hover {
+  color: var(--text);
+}
+
+.nav a.active {
+  color: var(--text);
+  border-bottom-color: var(--primary);
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* --- Components ---------------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentcolor;
+}
+
+.badge--admin {
+  color: var(--admin);
+}
+
+.badge--staff {
+  color: var(--staff);
+}
+
+.button {
+  font: inherit;
+  font-weight: 600;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.button--ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.button--ghost:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+.alert {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+}
+
+.alert--error {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+/* --- Forms --------------------------------------------------------------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.field input {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.75rem;
+}
+
+.field input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.field__error {
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+/* --- Login --------------------------------------------------------------- */
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.login__card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.demo-accounts {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.demo-accounts__buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
