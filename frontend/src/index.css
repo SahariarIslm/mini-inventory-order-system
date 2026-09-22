@@ -480,6 +480,86 @@ h1 {
   color: var(--text);
 }
 
+a.button {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.button--small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.875rem;
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.button--small:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.button--small:disabled {
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.count {
+  display: inline-block;
+  min-width: 1.4em;
+  margin-left: 0.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4em;
+  text-align: center;
+}
+
+.table tfoot td {
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.stepper button {
+  font: inherit;
+  width: 2rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 0;
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.stepper input {
+  font: inherit;
+  width: 3.5rem;
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 0;
+  border-inline: 1px solid var(--border);
+  appearance: textfield;
+}
+
+.stepper input::-webkit-inner-spin-button,
+.stepper input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
 /* --- Login --------------------------------------------------------------- */
 
 .login {

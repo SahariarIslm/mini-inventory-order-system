@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider'
 import { Layout } from './components/Layout'
 import { RequireAuth } from './components/RequireAuth'
+import { CartPage } from './pages/cart/CartPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { ProductsPage } from './pages/products/ProductsPage'
@@ -17,6 +18,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="products" element={<ProductsPage />} />
+              <Route path="cart" element={<CartPage />} />
             </Route>
           </Route>
 

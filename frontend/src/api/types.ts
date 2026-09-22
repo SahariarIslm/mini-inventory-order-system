@@ -41,6 +41,43 @@ export interface Product {
   updated_at: string
 }
 
+export type OrderStatus = 'confirmed' | 'cancelled'
+
+export interface OrderItem {
+  id: number
+  /** Null if the product has since been deleted; the snapshot fields remain. */
+  product_id: number | null
+  product_name: string
+  product_sku: string
+  unit_price: string
+  quantity: number
+  line_total: string
+}
+
+export interface Order {
+  id: number
+  user_id: number
+  user?: { id: number; name: string }
+  idempotency_key: string
+  status: OrderStatus
+  total: string
+  items: OrderItem[]
+  created_at: string
+}
+
+export interface OrderLineInput {
+  product_id: number
+  quantity: number
+}
+
+/** Body of a 409 from order placement or stock adjustment. */
+export interface InsufficientStockBody {
+  message: string
+  product_id: number
+  available: number
+  requested: number
+}
+
 /** Form values are sent as typed; Laravel validates and coerces them. */
 export interface ProductInput {
   name: string

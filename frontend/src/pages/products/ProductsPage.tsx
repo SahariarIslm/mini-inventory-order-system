@@ -3,6 +3,7 @@ import { ApiError } from '../../api/client'
 import { productsApi } from '../../api/products'
 import type { Product } from '../../api/types'
 import { useAuth } from '../../auth/useAuth'
+import { useCart } from '../../cart/useCart'
 import { Pagination } from '../../components/Pagination'
 import { StockBadge } from '../../components/StockBadge'
 import { usePaginated } from '../../hooks/usePaginated'
@@ -47,7 +48,7 @@ export function ProductsPage() {
       <div className="page-header">
         <div>
           <h1>Products</h1>
-          <p className="muted">{isAdmin ? 'Manage the catalogue and stock levels.' : 'Browse the catalogue.'}</p>
+          <p className="muted">{isAdmin ? 'Manage the catalogue and stock levels.' : 'Browse the catalogue and add items to an order.'}</p>
         </div>
         {isAdmin && (
           <button type="button" className="button button--primary" onClick={() => setModal({ type: 'create' })}>
@@ -83,7 +84,7 @@ export function ProductsPage() {
                 <th>Product</th>
                 <th className="num">Price</th>
                 <th>Stock</th>
-                {isAdmin && <th className="actions-col">Actions</th>}
+                <th className="actions-col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -97,21 +98,24 @@ export function ProductsPage() {
                   <td>
                     <StockBadge quantity={product.stock_quantity} />
                   </td>
-                  {isAdmin && (
-                    <td className="actions-col">
-                      <div className="row-actions">
-                        <button type="button" className="link-button" onClick={() => setModal({ type: 'stock', product })}>
-                          Adjust stock
-                        </button>
-                        <button type="button" className="link-button" onClick={() => setModal({ type: 'edit', product })}>
-                          Edit
-                        </button>
-                        <button type="button" className="link-button link-button--danger" onClick={() => void handleDelete(product)}>
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  )}
+                  <td className="actions-col">
+                    <div className="row-actions">
+                      <AddToOrderButton product={product} />
+                      {isAdmin && (
+                        <>
+                          <button type="button" className="link-button" onClick={() => setModal({ type: 'stock', product })}>
+                            Adjust stock
+                          </button>
+                          <button type="button" className="link-button" onClick={() => setModal({ type: 'edit', product })}>
+                            Edit
+                          </button>
+                          <button type="button" className="link-button link-button--danger" onClick={() => void handleDelete(product)}>
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -125,5 +129,16 @@ export function ProductsPage() {
       {modal?.type === 'edit' && <ProductFormModal product={modal.product} onClose={() => setModal(null)} onSaved={handleSaved} />}
       {modal?.type === 'stock' && <AdjustStockModal product={modal.product} onClose={() => setModal(null)} onSaved={handleSaved} />}
     </section>
+  )
+}
+
+function AddToOrderButton({ product }: { product: Product }) {
+  const { lines, add } = useCart()
+  const inCart = lines.find((line) => line.product.id === product.id)?.quantity ?? 0
+
+  return (
+    <button type="button" className="button button--small" disabled={!product.in_stock} onClick={() => add(product)}>
+      {inCart > 0 ? `Add another (${inCart})` : 'Add to order'}
+    </button>
   )
 }
