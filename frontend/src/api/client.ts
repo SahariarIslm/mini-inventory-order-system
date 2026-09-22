@@ -4,12 +4,15 @@ import type { ValidationErrors } from './types'
 export class ApiError extends Error {
   readonly status: number
   readonly errors: ValidationErrors
+  /** Raw response body, for endpoint-specific details (e.g. a 409's `available`). */
+  readonly body: unknown
 
-  constructor(status: number, message: string, errors: ValidationErrors = {}) {
+  constructor(status: number, message: string, errors: ValidationErrors = {}, body: unknown = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.errors = errors
+    this.body = body
   }
 
   /** First message for a field, e.g. from a 422 response. */
@@ -75,6 +78,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       response.status,
       error?.message ?? `Request failed (${response.status}).`,
       error?.errors ?? {},
+      data,
     )
   }
 

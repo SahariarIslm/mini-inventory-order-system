@@ -14,6 +14,7 @@ export function Layout() {
             <NavLink to="/" end>
               Home
             </NavLink>
+            <NavLink to="/products">Products</NavLink>
           </nav>
 
           {user && (
