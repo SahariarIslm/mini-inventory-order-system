@@ -74,7 +74,7 @@ export function CartPage() {
   if (lines.length === 0) {
     return (
       <section className="card">
-        <h1>Your order</h1>
+        <h1>Cart</h1>
         <p className="muted">
           Nothing here yet. <Link to="/products">Browse products</Link> and add some.
         </p>
@@ -86,7 +86,7 @@ export function CartPage() {
     <section>
       <div className="page-header">
         <div>
-          <h1>Your order</h1>
+          <h1>Cart</h1>
           <p className="muted">Stock is checked and reserved when you place the order.</p>
         </div>
       </div>

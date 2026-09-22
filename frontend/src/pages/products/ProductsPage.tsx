@@ -144,7 +144,7 @@ function AddToOrderButton({ product }: { product: Product }) {
 
   return (
     <button type="button" className="button button--small" disabled={!product.in_stock} onClick={() => add(product)}>
-      {inCart > 0 ? `Add another (${inCart})` : 'Add to order'}
+      {inCart > 0 ? `Add another (${inCart})` : 'Add to cart'}
     </button>
   )
 }

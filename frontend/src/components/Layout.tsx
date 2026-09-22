@@ -32,7 +32,7 @@ function Header() {
           <NavLink to="/products">Products</NavLink>
           <NavLink to="/orders">{user?.role === 'admin' ? 'All orders' : 'My orders'}</NavLink>
           <NavLink to="/cart">
-            Your order{itemCount > 0 && <span className="count">{itemCount}</span>}
+            Cart{itemCount > 0 && <span className="count">{itemCount}</span>}
           </NavLink>
         </nav>
 
