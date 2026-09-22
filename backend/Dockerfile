@@ -17,8 +17,20 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# Dev dependencies are included on purpose: the demo seeder uses factories
+# (fakerphp/faker). The lock-hash stamp lets the entrypoint tell whether a
+# (volume-persisted) vendor/ still matches composer.lock.
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
+    && sha1sum composer.lock | cut -d' ' -f1 > vendor/.composer-lock-hash
+
+# Outside the bind-mounted app directory, so it can't be shadowed. The sed
+# strips CRLF in case the script was checked out on Windows without
+# .gitattributes applied.
+COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint \
+    && chmod +x /usr/local/bin/docker-entrypoint
 
 EXPOSE 8000
 
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

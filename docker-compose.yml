@@ -1,13 +1,16 @@
+# Values like ${DB_PASSWORD:-secret} come from the root .env when present and
+# otherwise fall back to the same defaults as .env.example — so a fresh clone
+# works with just `docker compose up --build -d`.
 services:
   mysql:
     image: mysql:8.0
     container_name: mios_mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE:-mios}
+      MYSQL_USER: ${DB_USERNAME:-mios_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
     ports:
       - "3307:3306"
     volumes:
@@ -16,7 +19,7 @@ services:
     networks:
       - mios_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_secret}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -45,15 +48,19 @@ services:
     restart: unless-stopped
     volumes:
       - ./backend:/var/www/html
+      # Anonymous volume: keeps the image's composer-installed vendor/ from
+      # being hidden by the bind mount above (a fresh clone has no vendor/).
+      # The entrypoint reinstalls if it drifts from composer.lock.
+      - /var/www/html/vendor
     ports:
       - "8000:8000"
     environment:
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE:-mios}
+      DB_USERNAME: ${DB_USERNAME:-mios_user}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       CACHE_DRIVER: redis
@@ -61,6 +68,13 @@ services:
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
       REDIS_CLIENT: predis
+    # Healthy once the entrypoint has migrated/seeded and the server answers.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8000/up"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
     depends_on:
       mysql:
         condition: service_healthy
