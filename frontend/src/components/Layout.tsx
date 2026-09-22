@@ -31,6 +31,7 @@ function Header() {
             Home
           </NavLink>
           <NavLink to="/products">Products</NavLink>
+          <NavLink to="/orders">{user?.role === 'admin' ? 'All orders' : 'My orders'}</NavLink>
           <NavLink to="/cart">
             Your order{itemCount > 0 && <span className="count">{itemCount}</span>}
           </NavLink>

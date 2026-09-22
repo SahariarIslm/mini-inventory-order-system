@@ -5,6 +5,7 @@ import { ordersApi } from '../../api/orders'
 import type { InsufficientStockBody, Order } from '../../api/types'
 import type { CartLine } from '../../cart/CartContext'
 import { useCart } from '../../cart/useCart'
+import { OrderItemsTable } from '../../components/OrderItemsTable'
 import { newIdempotencyKey } from '../../lib/idempotencyKey'
 import { formatCents, toCents } from '../../lib/money'
 
@@ -57,9 +58,12 @@ export function CartPage() {
       <section className="card">
         <h1>Order #{placed.id} placed</h1>
         <p className="muted">Stock has been reserved for every item below.</p>
-        <OrderSummary order={placed} />
+        <OrderItemsTable order={placed} />
         <div className="form__actions">
-          <Link to="/products" className="button button--primary" onClick={() => setPlaced(null)}>
+          <Link to={`/orders/${placed.id}`} className="button button--ghost">
+            View order
+          </Link>
+          <Link to="/products" className="button button--primary">
             Continue shopping
           </Link>
         </div>
@@ -216,43 +220,5 @@ function QuantityStepper({ value, onChange, label }: { value: number; onChange: 
         +
       </button>
     </div>
-  )
-}
-
-function OrderSummary({ order }: { order: Order }) {
-  return (
-    <table className="table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th className="num">Unit price</th>
-          <th className="num">Qty</th>
-          <th className="num">Line total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {order.items.map((item) => (
-          <tr key={item.id}>
-            <td>
-              <div className="cell-title">{item.product_name}</div>
-              <div className="cell-sub">{item.product_sku}</div>
-            </td>
-            <td className="num">{item.unit_price}</td>
-            <td className="num">{item.quantity}</td>
-            <td className="num">{item.line_total}</td>
-          </tr>
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={3} className="num">
-            <strong>Total</strong>
-          </td>
-          <td className="num">
-            <strong>{order.total}</strong>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
   )
 }

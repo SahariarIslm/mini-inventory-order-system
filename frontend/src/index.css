@@ -480,6 +480,28 @@ h1 {
   color: var(--text);
 }
 
+.alert--success {
+  color: var(--staff);
+  background: color-mix(in srgb, var(--staff) 12%, transparent);
+}
+
+.button--danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.button--danger:hover:not(:disabled) {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+h1 .stock {
+  vertical-align: middle;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
 a.button {
   display: inline-block;
   text-decoration: none;

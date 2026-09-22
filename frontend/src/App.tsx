@@ -5,6 +5,8 @@ import { RequireAuth } from './components/RequireAuth'
 import { CartPage } from './pages/cart/CartPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
+import { OrderDetailPage } from './pages/orders/OrderDetailPage'
+import { OrdersPage } from './pages/orders/OrdersPage'
 import { ProductsPage } from './pages/products/ProductsPage'
 
 export default function App() {
@@ -19,6 +21,8 @@ export default function App() {
               <Route index element={<HomePage />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="cart" element={<CartPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="orders/:id" element={<OrderDetailPage />} />
             </Route>
           </Route>
 
