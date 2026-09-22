@@ -43,4 +43,11 @@ class OrderController extends Controller
 
         return new OrderResource($order->load(['items', 'user']));
     }
+
+    public function cancel(Order $order, OrderService $orders)
+    {
+        Gate::authorize('cancel', $order);
+
+        return new OrderResource($orders->cancel($order)->load('user'));
+    }
 }

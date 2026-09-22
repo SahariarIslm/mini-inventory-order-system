@@ -16,4 +16,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/products/{product}/stock-adjustments', StockAdjustmentController::class);
 
     Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show']);
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
 });

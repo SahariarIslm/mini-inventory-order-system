@@ -51,6 +51,40 @@ class OrderService
         }
     }
 
+    /**
+     * Cancel an order and return its stock, at most once.
+     *
+     * The order row is re-read under SELECT ... FOR UPDATE, so the status
+     * check and the restock are atomic: of two concurrent cancels, the second
+     * waits, then sees 'cancelled' and does nothing. Already-cancelled orders
+     * are returned unchanged, making cancellation safe to retry. Stock goes
+     * back via StockService in ascending product id order, the same lock
+     * order placement uses. Lines whose product was deleted are skipped.
+     */
+    public function cancel(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $locked = Order::whereKey($order->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($locked->status === OrderStatus::Cancelled) {
+                return $locked->load('items');
+            }
+
+            $items = $locked->items()->whereNotNull('product_id')->orderBy('product_id')->get();
+            $products = Product::findMany($items->pluck('product_id'))->keyBy('id');
+
+            foreach ($items as $item) {
+                if ($product = $products->get($item->product_id)) {
+                    $this->stock->adjust($product, $item->quantity);
+                }
+            }
+
+            $locked->update(['status' => OrderStatus::Cancelled]);
+
+            return $locked->load('items');
+        }, attempts: 3);
+    }
+
     private function createOrder(User $user, string $idempotencyKey, array $items): Order
     {
         $order = $user->orders()->create([
