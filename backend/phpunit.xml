@@ -32,5 +32,14 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- docker-compose sets these as real container env vars, which land in
+             $_SERVER — and Laravel's env() reads $_SERVER before $_ENV, so the
+             <env> entries above lose. <server> overwrites $_SERVER directly,
+             keeping tests (and RefreshDatabase) off the dev MySQL DB and Redis. -->
+        <server name="DB_CONNECTION" value="sqlite"/>
+        <server name="DB_DATABASE" value=":memory:"/>
+        <server name="CACHE_STORE" value="array"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <server name="SESSION_DRIVER" value="array"/>
     </php>
 </phpunit>
