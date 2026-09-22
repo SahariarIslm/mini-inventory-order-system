@@ -31,4 +31,9 @@ class ProductPolicy
     {
         return $user->isAdmin();
     }
+
+    public function adjustStock(User $user, Product $product): bool
+    {
+        return $user->isAdmin();
+    }
 }
