@@ -59,6 +59,7 @@ services:
       CACHE_STORE: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
+      REDIS_CLIENT: predis
     depends_on:
       mysql:
         condition: service_healthy
