@@ -8,18 +8,22 @@ use RuntimeException;
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Runs after the app boots but before RefreshDatabase migrates. Abort
-     * unless we're on the in-memory test database, so a misconfigured
-     * environment can never wipe the dev database.
+     * Runs after the app boots but before RefreshDatabase/DatabaseTruncation
+     * touch the schema. Abort unless we're on a dedicated test database
+     * (sqlite :memory:, or a MySQL database named *_testing), so a
+     * misconfigured environment can never wipe the dev database.
      */
     protected function setUpTraits()
     {
         $connection = config('database.default');
-        $database = config("database.connections.{$connection}.database");
+        $database = (string) config("database.connections.{$connection}.database");
 
-        if ($connection !== 'sqlite' || $database !== ':memory:') {
+        $isTestDatabase = ($connection === 'sqlite' && $database === ':memory:')
+            || ($connection === 'mysql' && str_ends_with($database, '_testing'));
+
+        if (! $isTestDatabase) {
             throw new RuntimeException(
-                "Refusing to run tests against [{$connection}:{$database}] — expected sqlite :memory:. Check phpunit.xml."
+                "Refusing to run tests against [{$connection}:{$database}] — expected sqlite :memory: or a *_testing MySQL database. Check the phpunit config."
             );
         }
 

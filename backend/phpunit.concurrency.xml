@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Real-concurrency suite: runs against MySQL (sqlite ignores SELECT ... FOR
+    UPDATE, so row locking can't be proven there). Kept out of phpunit.xml so
+    the default `php artisan test` stays fast and database-free.
+
+        docker compose exec app php artisan test -c phpunit.concurrency.xml
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Concurrency">
+            <directory>tests/Concurrency</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- <server>, not <env>: docker-compose's container env vars live in
+             $_SERVER, which Laravel reads first (see phpunit.xml). -->
+        <server name="DB_CONNECTION" value="mysql"/>
+        <server name="DB_DATABASE" value="mios_testing"/>
+        <server name="DB_URL" value=""/>
+        <server name="CACHE_STORE" value="array"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <server name="SESSION_DRIVER" value="array"/>
+    </php>
+</phpunit>
