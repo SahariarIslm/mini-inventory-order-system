@@ -16,19 +16,15 @@ Laravel API + React (TypeScript) technical assessment for Akaar IT Ltd.
 ## Quick start
 
 ```bash
-# 1. Environment files (the defaults work together as-is)
-cp .env.example .env
-cp backend/.env.example backend/.env
-
-# 2. Build, install PHP dependencies, generate the app key
-docker compose build
-docker compose run --rm --no-deps app composer install
-docker compose run --rm --no-deps app php artisan key:generate
-
-# 3. Start everything, then create the schema and demo data
-docker compose up -d
-docker compose exec app php artisan migrate --seed
+git clone <repo-url> mini-inventory-order-system
+cd mini-inventory-order-system
+docker compose up --build -d
 ```
+
+That's all — no `.env` to copy, no `composer install`, `npm install`,
+`key:generate`, `migrate` or `db:seed`. The first start takes a minute or two
+(image builds); `docker compose ps` shows `app` as **healthy** once the API
+has migrated, seeded and is answering.
 
 Open **http://localhost:5173** and sign in with a demo account (the login page
 has one-click buttons for both):
@@ -48,9 +44,29 @@ in stock, for trying the race by hand (see below).
 | MySQL      | `localhost:3307`        | databases `mios` (dev) and `mios_testing` (tests)  |
 | Redis      | `localhost:6379`        | cache / queue / session                            |
 
-> **Why step 2 installs Composer deps separately:** `./backend` is bind-mounted
-> over the image's copy for live editing, which hides the `vendor/` baked into
-> the image. The frontend container installs its own `node_modules` on start.
+### What happens on start
+
+Both app containers run an entrypoint script (`backend/docker/entrypoint.sh`,
+`frontend/docker/entrypoint.sh`) that is safe to run on every start:
+
+| Step | First start (fresh clone) | Later starts / `docker compose restart` |
+|------|---------------------------|------------------------------------------|
+| Dependencies | come from the image (`composer install` / `npm ci` at build time) | reinstalled only if `composer.lock` / `package-lock.json` changed |
+| `backend/.env` | copied from `.env.example` | left alone |
+| `APP_KEY` | generated into `backend/.env` | left alone |
+| Database | waits for a real MySQL connection, then `migrate --force` | `migrate` finds nothing to do |
+| Demo data | seeded (`app:seed-if-empty`) | **skipped** — the database already has users |
+
+- **Configuration:** Docker Compose falls back to the same defaults as
+  `.env.example` (database `mios`, user `mios_user`, …). To change them, copy
+  `.env.example` to `.env` and edit it before the first start.
+- **Why `vendor/` and `node_modules/` are Docker volumes:** the source folders
+  are bind-mounted for live editing, which would otherwise hide the
+  dependencies installed in the images — and a fresh clone has none on disk.
+  Each image stamps its lockfile hash into the volume, so a dependency change
+  followed by `docker compose up --build -d` is picked up automatically.
+- **Starting over with an empty database:** `docker compose down -v` removes
+  the data volumes; the next `up` migrates and seeds from scratch.
 
 ---
 
@@ -131,7 +147,8 @@ being applied twice.
 Two suites, both run inside Docker:
 
 ```bash
-# Main suite — 76 tests: auth, products, stock, orders, idempotency, policies.
+# Main suite — 81 tests: auth, products, stock, orders, idempotency, policies,
+# and the container bootstrap commands.
 # Runs on in-memory SQLite, so it's fast and never touches your data.
 docker compose exec app php artisan test
 
@@ -211,12 +228,15 @@ backend/
   app/Http/Resources/    response shaping (prices as exact decimal strings)
   app/Policies/          ProductPolicy, OrderPolicy
   app/Exceptions/        InsufficientStockException → 409
+  app/Console/Commands/  app:wait-for-database, app:seed-if-empty (used on container start)
+  docker/entrypoint.sh   container bootstrap: deps, .env, key, migrate, seed-if-empty
   tests/Feature/         main suite (SQLite)
   tests/Concurrency/     real-MySQL race suite + worker script
 frontend/src/
   api/                   typed fetch client, per-resource API modules
   auth/, cart/           context providers
   pages/                 login, products, cart/checkout, orders
+frontend/docker/         entrypoint: re-runs npm ci if package-lock.json changed
 docker/mysql/init/       creates mios_testing on first MySQL start
 ```
 
