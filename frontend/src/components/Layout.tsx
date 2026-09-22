@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import { CartProvider } from '../cart/CartProvider'
 import { useCart } from '../cart/useCart'
@@ -24,12 +24,11 @@ function Header() {
   return (
     <header className="app-header">
       <div className="app-header__inner">
-        <span className="brand">Mini Inventory</span>
+        <Link to="/products" className="brand">
+          Mini Inventory
+        </Link>
 
         <nav className="nav">
-          <NavLink to="/" end>
-            Home
-          </NavLink>
           <NavLink to="/products">Products</NavLink>
           <NavLink to="/orders">{user?.role === 'admin' ? 'All orders' : 'My orders'}</NavLink>
           <NavLink to="/cart">

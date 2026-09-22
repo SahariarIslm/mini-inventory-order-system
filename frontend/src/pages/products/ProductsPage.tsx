@@ -6,6 +6,8 @@ import { useAuth } from '../../auth/useAuth'
 import { useCart } from '../../cart/useCart'
 import { Pagination } from '../../components/Pagination'
 import { StockBadge } from '../../components/StockBadge'
+import { EmptyPage } from '../../components/Pagination'
+import { usePageParam } from '../../hooks/usePageParam'
 import { usePaginated } from '../../hooks/usePaginated'
 import { AdjustStockModal } from './AdjustStockModal'
 import { ProductFormModal } from './ProductFormModal'
@@ -16,7 +18,7 @@ export function ProductsPage() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = usePageParam()
   const products = usePaginated(productsApi.list, page)
   const [modal, setModal] = useState<ModalState>(null)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -76,7 +78,11 @@ export function ProductsPage() {
         {products.result === null ? (
           products.status === 'loading' && <p className="page-status">Loading products…</p>
         ) : rows.length === 0 ? (
-          <p className="page-status">No products yet.</p>
+          page > 1 ? (
+            <EmptyPage page={page} onFirstPage={() => setPage(1)} />
+          ) : (
+            <p className="page-status">No products yet.</p>
+          )
         ) : (
           <table className="table" aria-busy={products.status === 'loading'}>
             <thead>

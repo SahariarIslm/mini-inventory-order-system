@@ -3,7 +3,6 @@ import { AuthProvider } from './auth/AuthProvider'
 import { Layout } from './components/Layout'
 import { RequireAuth } from './components/RequireAuth'
 import { CartPage } from './pages/cart/CartPage'
-import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { OrderDetailPage } from './pages/orders/OrderDetailPage'
 import { OrdersPage } from './pages/orders/OrdersPage'
@@ -18,7 +17,7 @@ export default function App() {
 
           <Route element={<RequireAuth />}>
             <Route element={<Layout />}>
-              <Route index element={<HomePage />} />
+              <Route index element={<Navigate to="/products" replace />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="cart" element={<CartPage />} />
               <Route path="orders" element={<OrdersPage />} />

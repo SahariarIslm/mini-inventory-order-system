@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import { Link } from 'react-router'
 import { ordersApi } from '../../api/orders'
 import { useAuth } from '../../auth/useAuth'
 import { OrderStatusBadge } from '../../components/OrderStatusBadge'
-import { Pagination } from '../../components/Pagination'
+import { EmptyPage, Pagination } from '../../components/Pagination'
+import { usePageParam } from '../../hooks/usePageParam'
 import { usePaginated } from '../../hooks/usePaginated'
 import { formatDateTime } from '../../lib/dates'
 
@@ -11,7 +11,7 @@ export function OrdersPage() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = usePageParam()
   const orders = usePaginated(ordersApi.list, page)
   const rows = orders.result?.data ?? []
 
@@ -36,6 +36,8 @@ export function OrdersPage() {
       <div className="card card--flush">
         {orders.result === null ? (
           orders.status === 'loading' && <p className="page-status">Loading orders…</p>
+        ) : rows.length === 0 && page > 1 ? (
+          <EmptyPage page={page} onFirstPage={() => setPage(1)} />
         ) : rows.length === 0 ? (
           <p className="page-status">
             No orders yet. <Link to="/products">Browse products</Link> to place one.

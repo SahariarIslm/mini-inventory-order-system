@@ -5,6 +5,18 @@ interface PaginationProps {
   onPageChange: (page: number) => void
 }
 
+/** Shown for a ?page=N beyond the last page (e.g. an old link). */
+export function EmptyPage({ page, onFirstPage }: { page: number; onFirstPage: () => void }) {
+  return (
+    <p className="page-status">
+      Nothing on page {page}.{' '}
+      <button type="button" className="link-button" onClick={onFirstPage}>
+        Go to the first page
+      </button>
+    </p>
+  )
+}
+
 export function Pagination({ meta, onPageChange }: PaginationProps) {
   if (meta.last_page <= 1) return null
 
