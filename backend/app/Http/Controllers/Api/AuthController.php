@@ -14,21 +14,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
-
-        \Illuminate\Support\Facades\Log::info('LOGIN DEBUG credentials', $credentials);
-
-        \Illuminate\Support\Facades\Log::info('LOGIN DEBUG db', [
-            'connection' => config('database.default'),
-            'database' => \Illuminate\Support\Facades\DB::connection()->getDatabaseName(),
-            'total_users' => \App\Models\User::count(),
-        ]);
-
         $user = User::where('email', $credentials['email'])->first();
-
-        \Illuminate\Support\Facades\Log::info('LOGIN DEBUG result', [
-            'user_found' => $user ? $user->email : null,
-            'hash_check' => $user ? Hash::check($credentials['password'], $user->password) : null,
-        ]);
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
