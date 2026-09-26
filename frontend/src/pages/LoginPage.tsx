@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { ApiError } from '../api/client'
 import { useAuth } from '../auth/useAuth'
 
@@ -86,6 +86,10 @@ export function LoginPage() {
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <p className="login__switch muted">
+          Don&apos;t have an account? <Link to="/register">Register</Link>
+        </p>
 
         <div className="demo-accounts">
           <p className="muted">Demo accounts (password: {DEMO_PASSWORD})</p>

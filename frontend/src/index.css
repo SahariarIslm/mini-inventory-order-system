@@ -596,6 +596,16 @@ a.button {
   max-width: 400px;
 }
 
+.login__switch {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.login__switch a {
+  color: var(--primary);
+}
+
 .demo-accounts {
   margin-top: 1.5rem;
   padding-top: 1rem;

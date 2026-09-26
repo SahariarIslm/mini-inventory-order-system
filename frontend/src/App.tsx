@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage'
 import { OrderDetailPage } from './pages/orders/OrderDetailPage'
 import { OrdersPage } from './pages/orders/OrdersPage'
 import { ProductsPage } from './pages/products/ProductsPage'
+import { RegisterPage } from './pages/RegisterPage'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           <Route element={<RequireAuth />}>
             <Route element={<Layout />}>

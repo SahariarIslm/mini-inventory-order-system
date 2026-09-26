@@ -7,9 +7,18 @@ export interface User {
   role: Role
 }
 
+/** Returned by both /login and /register. */
 export interface LoginResponse {
   user: User
   token: string
+}
+
+/** No role: the server always creates self-registered users as staff. */
+export interface RegisterInput {
+  name: string
+  email: string
+  password: string
+  password_confirmation: string
 }
 
 /** Laravel's 422 body: field name -> list of messages. */

@@ -59,6 +59,81 @@ class AuthTest extends TestCase
             ->assertJsonValidationErrors(['email', 'password']);
     }
 
+    public function test_register_creates_a_staff_user_and_returns_a_token(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'New Person',
+            'email' => 'new@example.com',
+            'password' => 'secret-password',
+            'password_confirmation' => 'secret-password',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonStructure(['user' => ['id', 'name', 'email', 'role'], 'token'])
+            ->assertJsonPath('user.email', 'new@example.com')
+            ->assertJsonPath('user.role', 'staff')
+            ->assertJsonMissingPath('user.password');
+
+        $user = User::where('email', 'new@example.com')->sole();
+        $this->assertSame('staff', $user->role);
+        $this->assertCount(1, $user->tokens);
+
+        // The returned token is immediately usable.
+        $this->withToken($response->json('token'))
+            ->getJson('/api/me')
+            ->assertOk()
+            ->assertJsonPath('id', $user->id);
+    }
+
+    public function test_register_rejects_a_duplicate_email(): void
+    {
+        User::factory()->create(['email' => 'taken@example.com']);
+
+        $this->postJson('/api/register', [
+            'name' => 'Someone Else',
+            'email' => 'taken@example.com',
+            'password' => 'secret-password',
+            'password_confirmation' => 'secret-password',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['email']);
+
+        $this->assertDatabaseCount('users', 1);
+    }
+
+    public function test_register_validates_required_fields_and_password_confirmation(): void
+    {
+        $this->postJson('/api/register', [])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name', 'email', 'password']);
+
+        $this->postJson('/api/register', [
+            'name' => 'New Person',
+            'email' => 'new@example.com',
+            'password' => 'secret-password',
+            'password_confirmation' => 'different-password',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_register_ignores_a_client_supplied_admin_role(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Sneaky Person',
+            'email' => 'sneaky@example.com',
+            'password' => 'secret-password',
+            'password_confirmation' => 'secret-password',
+            'role' => 'admin',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('user.role', 'staff');
+
+        $user = User::where('email', 'sneaky@example.com')->sole();
+        $this->assertSame('staff', $user->role);
+        $this->assertFalse($user->isAdmin());
+    }
+
     public function test_me_returns_the_authenticated_user(): void
     {
         $user = User::factory()->create();
