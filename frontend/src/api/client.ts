@@ -48,7 +48,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   let response: Response
   try {
-    response = await fetch(`/api${path}`, {
+    response = await fetch(`${import.meta.env.VITE_API_URL ?? '/api'}${path}`, {
       method,
       headers: {
         Accept: 'application/json',
